@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 
 
-class Customers(models.Model):
+class Customer(models.Model):
     def __str__(self):
         return self.customer_name
 
@@ -60,7 +60,7 @@ class Vehicle(models.Model):
 
     vehicle_id = models.AutoField(primary_key=True)
     vehicle_customer = models.ForeignKey(
-        Customers,  on_delete=models.CASCADE)
+        Customer,  on_delete=models.CASCADE)
     vehicle_number = models.CharField(max_length=100)
     vehicle_type = models.CharField(max_length=100)
     is_favourite = models.BooleanField(default=True)
@@ -128,7 +128,7 @@ class CreditType(models.Model):
 class Credit(models.Model):
     credit_id = models.AutoField(primary_key=True)
     credit_customer = models.ForeignKey(
-        Customers, on_delete=models.CASCADE)
+        Customer, on_delete=models.CASCADE)
     credit_type = models.ForeignKey(
         CreditType, on_delete=models.CASCADE)
     # status: True means credit was increased, false means credit was decreased
@@ -149,7 +149,7 @@ class FavouriteCharger(models.Model):
     favourite_charger = models.ForeignKey(
         Charger, on_delete=models.CASCADE)
     favourite_customer = models.ForeignKey(
-        Customers,  on_delete=models.CASCADE)
+        Customer,  on_delete=models.CASCADE)
 
 
 class Appointment(models.Model):
@@ -157,7 +157,7 @@ class Appointment(models.Model):
         return "APP"+str(self.app_customer)+"/"+str(self.app_id)
     app_id = models.AutoField(primary_key=True)
     app_customer = models.ForeignKey(
-        Customers, on_delete=models.CASCADE)
+        Customer, on_delete=models.CASCADE)
     app_charger = models.ForeignKey(
         Charger,  on_delete=models.CASCADE)
     app_date_time = models.DateTimeField(blank=True, null=True)
@@ -168,7 +168,7 @@ class Appointment(models.Model):
     app_success = models.BooleanField(default=False)
 
 
-class Bill_Details(models.Model):
+class Bill_Detail(models.Model):
     def __str__(self):
         return "BILL"+str(self.bill_id)
 
@@ -186,50 +186,10 @@ class Bill_Details(models.Model):
     bill_app = models.ForeignKey(
         Appointment, on_delete=models.CASCADE)
 
-
-class SubAdmin(models.Model):
-    subadmin = models.OneToOneField(
-        User, on_delete=models.CASCADE, default=1)
-    subadmin_email = models.CharField(max_length=100)
-    subadmin_active = models.FloatField()
-
-    def __str__(self):
-        return self.subadmin.username
-
-
-class SubAdminAccess(models.Model):
-    access_id = models.AutoField(primary_key=True)
-    edit_user = models.BooleanField(default=False)
-    edit_host = models.BooleanField(default=False)
-    edit_billdetails = models.BooleanField(default=False)
-    edit_pumpdetails = models.BooleanField(default=False)
-    edit_appointments = models.BooleanField(default=False)
-    access_subadmin = models.ForeignKey(
-        SubAdmin,   on_delete=models.CASCADE)
-
-
-class BannerAds(models.Model):
+class BannerAd(models.Model):
     def __str__(self):
         return "ad"+self.banner_id
     banner_id = models.AutoField(primary_key=True)
     banner_subadmin_id = models.ForeignKey(
-        SubAdmin, on_delete=models.CASCADE)
+        User, on_delete=models.CASCADE)
     file_path = models.FilePathField(default=None)
-
-
-class SubscriptionType(models.Model):
-    def __str__(self):
-        return self.s_type+" Subscription"
-    s_type_id = models.AutoField(primary_key=True)
-    s_type = models.CharField(max_length=100)
-    s_title = models.CharField(max_length=100)
-    s_description = models.CharField(max_length=100)
-    s_price_pm = models.IntegerField(default=0)
-
-
-class Subscription(models.Model):
-    subscription_id = models.AutoField(primary_key=True)
-    subscription_type = models.ForeignKey(
-        SubscriptionType, on_delete=models.CASCADE)
-    subscription_customer = models.ForeignKey(
-        Customers, on_delete=models.CASCADE)
